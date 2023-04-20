@@ -1,0 +1,25 @@
+version: '3'
+services:
+  db:
+    image: mysql
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: demo-db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - ./mysql_data:/data/db
+    # command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+  python3:
+    restart: always
+    build: .
+    container_name: 'python3'
+    working_dir: '/root/'
+    tty: true
+    volumes:
+      - ./opt:/root/opt
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
