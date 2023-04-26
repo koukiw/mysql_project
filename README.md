@@ -1,5 +1,8 @@
 # mysql_project
 mysqlにフォルダごとファイル情報を保存していく
+進捗
+
+docker上にmysqlコンテナ作成まで完了
 
 今後やること
 
