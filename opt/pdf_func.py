@@ -7,6 +7,7 @@ import glob
 import shutil
 import warnings
 import pdfminer
+import pandas as pd
 
 from pdfminer.high_level import extract_text
 
@@ -14,19 +15,16 @@ CONFIG_KEY_PDF_FOLDER = "../pdf"
 
 
 # PDFからテキストを抜き出してjson形式で情報を整理（keyはtitle、text,file_format）
-def func_pdf2text(collection_name,dt_now):
-    process_name = ""
+def func_pdf2text(project_name,dt_now,output_df):
     try:
         #
         # PDF→テキスト情報抽出処理
         #
-        process_name = "PDFからのテキスト情報抽出"
-        if collection_name =="":
+        if project_name =="":
             files = glob.glob(os.path.join("./file_dir","*.pdf"),recursive=True)
         else:
-            files = glob.glob(os.path.join("./file_dir", collection_name,"**","*.pdf"),recursive=True)
+            files = glob.glob(os.path.join("./file_dir", project_name,"**","*.pdf"),recursive=True)
         cnt = 0
-        Input_path = "./pdf"
         print("pdffiles",files)
         results = []
         for file in files:
@@ -43,10 +41,15 @@ def func_pdf2text(collection_name,dt_now):
             filename  = os.path.basename(file)
 
             # result = {"ファイル名":filename,"text": text,"ファイル拡張子":"pdf","パス":file[11:]}
-            result = {"プロジェクト名":collection_name,"パス":file[11:],"ファイル名":filename,"text": text,"ファイル拡張子":"pdf","upload_data":dt_now}
-            results.append(result)
+            file_path  =file[11:]
 
-        return results
+            df_tmp  =pd.Series([10,file_path,filename,"pdf","text",dt_now,dt_now,'{"test":"hoge"}'],
+                               index=["project_id","path","file_name","file_format","text","create_date","upload_date","json_data"])
+            output_df = output_df.append(df_tmp,ignore_index=True)
+            # result = {"プロジェクト名":project_name,"パス":file[11:],"ファイル名":filename,"ファイル拡張子":"pdf","text": "text","create_data":dt_now,"upload_data":dt_now}
+            # results.append(result)
+
+        return output_df
             
     except Exception as e:
         print("pdf2textにてerror発生")
