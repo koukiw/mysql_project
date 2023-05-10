@@ -1,6 +1,9 @@
 version: '3'
 services:
   db:
+    build:
+        context: .
+        dockerfile: ./db/Dockerfile
     image: mysql
     container_name: mysql_db
     restart: always
@@ -19,7 +22,9 @@ services:
 
   python3:
     restart: always
-    build: .
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     container_name: 'python3'
     working_dir: '/root/'
     tty: true

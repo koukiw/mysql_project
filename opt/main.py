@@ -53,7 +53,6 @@ connection = mysql.connector.connect(user='kouki',  # ユーザー名
                                     # host = "host.docker.internal"#hostは下記とどっちでも良い
                                     host = "db",
                                     database = "demo_db",
-                                    charset = "utf8", # 設定を追加
                                 )
 
 
