@@ -1,13 +1,19 @@
 # mysql_project
 mysqlにフォルダごとファイル情報を保存していく
 
+進捗
+
+pdfからデータカタログ，テキストデータをmysqlに保存する際に日本語データの文字化け発生中．
+
+unicodeからutf-8に設定を変えていると思うが，文字化けが治っていない．
+
 
 
 今後やること
 
-1.pymsqlを用いてpythonからmysqlに接続（docker上に書き換える）
+1.pdfができたら，他のファイルフォーマットも同様に保存する．
 
-2.table修正
+2.データカタログとテキストデータの抽出コードを分ける．
 
 ローカルのpython上からmysql-connectorを使ってdocker上のmongoDBに接続.  
 
