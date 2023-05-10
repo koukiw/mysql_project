@@ -1,63 +1,78 @@
-from pymongo import MongoClient
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import mysql.connector
 from pdf_func import func_pdf2text
 from word_func import word2text
 from csv_func import csv2text
-import pdfminer
 import glob
 import datetime
 import pytz
+import pandas as pd
 
 #upload_dataは実行時の日時
 dt_now = datetime.datetime.now(pytz.timezone('Asia/Tokyo')).strftime('%Y%m%d%H%M%S')
 
-HOST = 'localhost'
-PORT = 27017
-USERNAME = 'root'
-PASSWORD = 'password'
-MONGODB_URL= "mongodb://127.0.0.1:27017"
-DB_NAME = 'demo_db'
-COLLECTION_NAME = 'demo_collection'
+# データベースに保存するpandasを作成
+output_df  = pd.DataFrame(columns=["project_name","path","file_name","file_format","text","create_date","upload_date","json_data"])
+print(output_df)
+
+dir_list = glob.glob('./file_dir/**/')
+for dir in dir_list:
+    project_name = dir[11:-1]  #文字列から./file_dirの部分を削除
+    print("ディレクトリ選択")
+    print(project_name)
+    output_df = func_pdf2text(project_name,dt_now,output_df)
+    # results.extend(word2text(project_name,dt_now))
+    # csv,excel = csv2text(project_name,dt_now)
+    # results.extend(csv)
+    # results.extend(excel)
 
 
-if __name__ == '__main__':
-    # ローカルのmongodb用リンク
-    # client = MongoClient(host=HOST, port=PORT, username=USERNAME, password=PASSWORD)
-    #　ローカルの場合は以下で接続できる
-    # client = MongoClient(username=USERNAME, password=PASSWORD)
+    # print(project_name[11:-1] + "完了")
+    # print(output_df)
+    # print(type(output_df))
 
-    # dockerコンテナ用リンク
-    #以下2行どちらでも接続可能
-    # client = MongoClient('mongodb://root:password@host.docker.internal:27017/')
-    client = MongoClient('mongodb://root:password@mongo:27017/')
-    
-    dir_list = glob.glob('./file_dir/**/')
-    db = client[DB_NAME]
-    for dir in dir_list:
-        collection_name = dir[11:-1]
-        print("ディレクトリ選択")
-        print(collection_name)
-        collection = db[COLLECTION_NAME]
-        results = func_pdf2text(collection_name,dt_now)
-        results.extend(word2text(collection_name,dt_now))
-        csv,excel = csv2text(collection_name,dt_now)
-        results.extend(csv)
-        results.extend(excel)
-        collection.insert_many(results)
-        print(collection_name[11:-1] + "完了")
-    
-    single_file_list = glob.glob('./file_dir/*.*')
-    if len(single_file_list)!=0:
-        collection = db[COLLECTION_NAME]
-        for single_file in single_file_list:
-            idx = single_file.rfind(".")
-            file_format = single_file[idx+1:]
-            if file_format =="pdf":
-                results = func_pdf2text("",dt_now)
-                collection.insert_many(results)
-            elif file_format =="docx":
-                results = word2text("",dt_now)
-                collection.insert_one(results)
-            elif file_format =="csv":
-                results = csv2text("",dt_now)
-                collection.insert_one(results)
+single_file_list = glob.glob('./file_dir/*.*')
+if len(single_file_list)!=0:
+    for single_file in single_file_list:
+        idx = single_file.rfind(".")
+        file_format = single_file[idx+1:]
+        if file_format =="pdf":
+            output_df = func_pdf2text("",dt_now,output_df)
+        # elif file_format =="docx":
+        #     results = word2text("",dt_now)
+        #     print(results)
+        # elif file_format =="csv":
+        #     results = csv2text("",dt_now)
+        #     print(results)
+print("output_df")
+print(output_df)
+# output_df.to_csv("./output.csv",index=False)
+# df = pd.read_csv("./output.csv")
+# データベースに接続
+connection = mysql.connector.connect(user='kouki',  # ユーザー名
+                                    password='password',  # パスワード
+                                    # host = "host.docker.internal"#hostは下記とどっちでも良い
+                                    host = "db",
+                                    database = "demo_db",
+                                    charset = "utf8mb4", # 設定を追加
+                                )
 
+
+
+# project_nameの親テーブルを先に保存
+# s = 0
+with connection:
+    with connection.cursor() as cursor:
+        for index,row in output_df.iterrows():
+            # レコードを挿入
+            sql = "INSERT INTO demo_table(project_name,path,file_name,file_format,text,create_date,upload_date,json_data) VALUES (%s,%s,%s, %s,%s,%s,%s,%s)"
+            cursor.execute(sql, (row["project_name"],row["path"],row["file_name"],row["file_format"],"test",row["create_date"],row["upload_date"],row["json_data"]))
+
+            sql = "INSERT INTO text_table(project_name,text_data) VALUES (%s,%s)"
+            cursor.execute(sql, (row["project_name"],row["text"]))
+
+    # コミットしてトランザクション実行
+    connection.commit()
+    print("demo_table,text_tableにデータ保存")

@@ -22,6 +22,7 @@ def func_pdf2text(project_name,dt_now,output_df):
         #
         if project_name =="":
             files = glob.glob(os.path.join("./file_dir","*.pdf"),recursive=True)
+            project_name= "single_file"
         else:
             files = glob.glob(os.path.join("./file_dir", project_name,"**","*.pdf"),recursive=True)
         cnt = 0
@@ -38,13 +39,13 @@ def func_pdf2text(project_name,dt_now,output_df):
             # テキストの加工
             text = text.replace("\n","").replace("\r","").replace("\t","").strip()
 
-            filename  = os.path.basename(file)
+            file_name  = os.path.basename(file)
 
             # result = {"ファイル名":filename,"text": text,"ファイル拡張子":"pdf","パス":file[11:]}
             file_path  =file[11:]
 
-            df_tmp  =pd.Series([10,file_path,filename,"pdf","text",dt_now,dt_now,'{"test":"hoge"}'],
-                               index=["project_id","path","file_name","file_format","text","create_date","upload_date","json_data"])
+            df_tmp  =pd.Series([project_name,file_path,file_name,"pdf",text[:5000],dt_now,dt_now,'{"test":"hoge"}'],
+                               index=["project_name","path","file_name","file_format","text","create_date","upload_date","json_data"])
             output_df = output_df.append(df_tmp,ignore_index=True)
             # result = {"プロジェクト名":project_name,"パス":file[11:],"ファイル名":filename,"ファイル拡張子":"pdf","text": "text","create_data":dt_now,"upload_data":dt_now}
             # results.append(result)
