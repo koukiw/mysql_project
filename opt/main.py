@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import mysql.connector
 from pdf_func import func_pdf2text
 from word_func import word2text
@@ -48,15 +45,15 @@ if len(single_file_list)!=0:
         #     print(results)
 print("output_df")
 print(output_df)
-# output_df.to_csv("./output.csv",index=False)
-# df = pd.read_csv("./output.csv")
+output_df.to_csv("./output.csv",index=False)
+df = pd.read_csv("./output.csv")
 # データベースに接続
 connection = mysql.connector.connect(user='kouki',  # ユーザー名
                                     password='password',  # パスワード
                                     # host = "host.docker.internal"#hostは下記とどっちでも良い
                                     host = "db",
                                     database = "demo_db",
-                                    charset = "utf8mb4", # 設定を追加
+                                    charset = "utf8", # 設定を追加
                                 )
 
 
@@ -64,8 +61,8 @@ connection = mysql.connector.connect(user='kouki',  # ユーザー名
 # project_nameの親テーブルを先に保存
 # s = 0
 with connection:
-    with connection.cursor() as cursor:
-        for index,row in output_df.iterrows():
+    with connection.cursor(buffered=True) as cursor:
+        for index,row in df.iterrows():
             # レコードを挿入
             sql = "INSERT INTO demo_table(project_name,path,file_name,file_format,text,create_date,upload_date,json_data) VALUES (%s,%s,%s, %s,%s,%s,%s,%s)"
             cursor.execute(sql, (row["project_name"],row["path"],row["file_name"],row["file_format"],"test",row["create_date"],row["upload_date"],row["json_data"]))
