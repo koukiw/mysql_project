@@ -1,21 +1,16 @@
 # mysql_project
 mysqlにフォルダごとファイル情報を保存していく
 
+ローカルのpython上からmysql-connectorを使ってdocker上のmysqlに接続.  
+
+
 進捗
 
-pdfからデータカタログ，テキストデータをmysqlに保存する際に日本語データの文字化け発生中．
+text_tableのtextカラムの最大文字数をvarchra(15000)に設定．
+utf8mb4に設定しているので，最大文字数16383になると思ったが，これだと
+initdb.d/reate_table.sqlから自動生成できない．
 
-unicodeからutf-8に設定を変えていると思うが，文字化けが治っていない．
-
-
-
-今後やること
-
-1.pdfができたら，他のファイルフォーマットも同様に保存する．
-
-2.データカタログとテキストデータの抽出コードを分ける．
-
-ローカルのpython上からmysql-connectorを使ってdocker上のmongoDBに接続.  
+手順 
 
 リポジトリをクローンして、   
 /opt/file_dirに保存したいファイル・ディレクトリをアップロードしたのち   
@@ -27,15 +22,26 @@ docker-compose build --no-cache
 ```python
 docker-compose up -d
 ```
-でコンテナ起動。　　　
+でコンテナ起動。
+
+## データカタログ作成．　　　
 ```python
 docker-compose exec python3 bash
 cd opt
-python main.py
+python data.py
+```
+
+## テキストデータ抽出．　　
+```python
+docker-compose exec python3 bash
+cd opt
+python text.py
 ```
 
 
-demo_db.demo_tableとdemo_db.text_tableテーブルにデータが格納されていることが確認できればOK
+demo_db.demo_tableにデータカタログ，
+
+demo_db.text_tableテーブルにテキストデータが格納されていることが確認できればOK
 ```python
 docker-compose exec db bin/bash
 ```
@@ -47,5 +53,7 @@ mysql -u kouki -p password
 
 ```mysql
 use demo_db
-select * from demo_db;
+select * from demo_table;
+select * from text_table;
 ```
+
