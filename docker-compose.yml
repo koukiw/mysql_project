@@ -16,7 +16,7 @@ services:
       MYSQL_PASSWORD: password
       TZ: 'Asia/Tokyo'
     volumes:
-      - ./mysql_data:/data/db
+      - ./mysql/db:/var/lib/mysql # データ永続化
       - ./initdb.d:/docker-entrypoint-initdb.d # コンテナ作成時に実行されるsqlファイルを格納するパスをdocker-entrypoint-initdb.dにマウント
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 
