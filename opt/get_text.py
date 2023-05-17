@@ -1,6 +1,7 @@
 import pandas as pd
 from pdfminer.high_level import extract_text
 from docx import Document
+from openpyxl import load_workbook
 
 # PDFからテキストを抜き出す
 def pdf2text(file):
@@ -32,6 +33,30 @@ def csv2text(file):
     except Exception as e:
         print("csv2textにてerror発生")
         return -1
+    
+def excel2text(file):
+    try:
+        workbook = load_workbook(file)
+        sheet_names= workbook.sheetnames
+        strings={}
+        for index in range(len(sheet_names)):
+            sheet = workbook[sheet_names[index]]
+
+            string = []
+
+            for row in sheet.iter_rows(values_only=True):
+                for cell in row:
+                    if isinstance(cell, str):
+                        string.append(cell)
+            strings[sheet_names[index]] = string
+            
+
+        return str(strings)
+    
+    except Exception as e:
+        print("excel2textにてerror発生")
+        return -1
+
 
 #  wordからテキストを抜き出す
 def word2text(file):

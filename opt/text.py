@@ -1,5 +1,5 @@
 import mysql.connector
-from get_text import pdf2text,word2text,csv2text
+from get_text import pdf2text,word2text,csv2text,excel2text
 import glob
 import datetime
 import pytz
@@ -34,6 +34,8 @@ def get_text(project_name):
                 text = pdf2text(file)
             elif file_format =="csv":
                 text = csv2text(file)
+            elif file_format =="xlsx":
+                text = excel2text(file)
             elif file_format =="docx":
                 text = word2text(file)
             data.append([project_name,file_path,file_name,text[:15000]]) 
