@@ -39,7 +39,7 @@ def pptx2text(file_path):
     return strings
 
 # PowerPointファイルのパスを指定して実行
-file_path = './DBプラットフォーム検討.pptx'
+file_path = '/Users/kouki/Desktop/iroribi/iroribi/mysql_dir/opt/file_dir/project1/テスト用パワポ資料.pptx'
 # result = extract_strings_from_powerpoint(file_path)
 # print(result)
 result = pptx2text(file_path)
