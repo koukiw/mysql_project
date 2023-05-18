@@ -1,5 +1,5 @@
 import mysql.connector
-from get_text import pdf2text,word2text,csv2text,excel2text
+from get_text import pdf2text,word2text,csv2text,excel2text,pptx2text
 import glob
 import datetime
 import pytz
@@ -38,6 +38,8 @@ def get_text(project_name):
                 text = excel2text(file)
             elif file_format =="docx":
                 text = word2text(file)
+            elif file_format =="pptx":
+                text = pptx2text(file)
             data.append([project_name,file_path,file_name,text[:15000]]) 
         df_tmp =pd.DataFrame(data = data,
                             columns=["project_name","path","file_name","text"])

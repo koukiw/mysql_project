@@ -2,6 +2,7 @@ import pandas as pd
 from pdfminer.high_level import extract_text
 from docx import Document
 from openpyxl import load_workbook
+from pptx import Presentation
 
 # PDFからテキストを抜き出す
 def pdf2text(file):
@@ -78,6 +79,25 @@ def word2text(file):
         
     except Exception as e:
         print("word2textにてerror発生")
+        return -1
+
+def pptx2text(file):
+    try:
+        strings = []
+        prs = Presentation(file)
+        for i, sld in enumerate(prs.slides, start=1):
+            for shp in sld.shapes:
+                if shp.has_text_frame:
+                    strings.append(shp.text)
+                if shp.has_table:
+                    tables =[]
+                    for row in shp.table.rows:
+                        values = [ cell.text for cell in row.cells ]
+                        tables.append(values)
+                    strings.append(tables)
+        return str(strings)
+    except Exception as e:
+        print("pptx2textにてerror発生")
         return -1
 
 # メイン処理
