@@ -89,6 +89,7 @@ def pptx2text(file):
             for shp in sld.shapes:
                 if shp.has_text_frame:
                     strings.append(shp.text)
+                #テーブル（表）からも文字列抽出
                 if shp.has_table:
                     tables =[]
                     for row in shp.table.rows:

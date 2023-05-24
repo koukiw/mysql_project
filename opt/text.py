@@ -15,10 +15,12 @@ output_df  = pd.DataFrame(columns=["project_name","path","file_name","text"])
 def get_text(project_name):
     try:
         if project_name =="":
-            files = glob.glob(os.path.join("./file_dir","*.*"),recursive=True)
+            files = glob.glob(os.path.join("./test_file_dir","*.*"),recursive=True)
+            # files = glob.glob(os.path.join("./file_dir","*.*"),recursive=True)
             project_name= "single_file"
         else:
-            files = glob.glob(os.path.join("./file_dir", project_name,"**","*.*"),recursive=True)
+            files = glob.glob(os.path.join("./test_file_dir", project_name,"**","*.*"),recursive=True)
+            # files = glob.glob(os.path.join("./file_dir", project_name,"**","*.*"),recursive=True)
         print(project_name)
         cnt = 0
         data = []
@@ -36,7 +38,7 @@ def get_text(project_name):
                 text = csv2text(file)
             elif file_format =="xlsx":
                 text = excel2text(file)
-            elif file_format =="docx":
+            elif file_format =="docx" or file_format =="doc":
                 text = word2text(file)
             elif file_format =="pptx":
                 text = pptx2text(file)
