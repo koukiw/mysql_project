@@ -1,5 +1,5 @@
 import mysql.connector
-from get_text import pdf2text,word2text,csv2text,excel2text,pptx2text
+from get_text import extract_text_from_file
 import glob
 import datetime
 import pytz
@@ -11,59 +11,37 @@ dt_now = datetime.datetime.now(pytz.timezone('Asia/Tokyo')).strftime('%Y%m%d%H%M
 
 # データベースに保存するpandasを作成
 output_df  = pd.DataFrame(columns=["project_name","path","file_name","text"])
-
-def get_text(project_name):
-    try:
-        if project_name =="":
-            files = glob.glob(os.path.join("./test_file_dir","*.*"),recursive=True)
-            # files = glob.glob(os.path.join("./file_dir","*.*"),recursive=True)
-            project_name= "single_file"
-        else:
-            files = glob.glob(os.path.join("./test_file_dir", project_name,"**","*.*"),recursive=True)
-            # files = glob.glob(os.path.join("./file_dir", project_name,"**","*.*"),recursive=True)
-        print(project_name)
-        cnt = 0
-        data = []
-        print(files)
-        for file in files:
-            cnt += 1
-            print("テキスト抽出中…（{}/{}）".format(cnt, len(files)))
-            print(file)
-            file_name  = os.path.basename(file)
-            file_path  =file[11:]
-            file_format = os.path.splitext(file)[1] [1:]
-            if file_format =="pdf":
-                text = pdf2text(file)
-            elif file_format =="csv":
-                text = csv2text(file)
-            elif file_format =="xlsx":
-                text = excel2text(file)
-            elif file_format =="docx" or file_format =="doc":
-                text = word2text(file)
-            elif file_format =="pptx":
-                text = pptx2text(file)
-            data.append([project_name,file_path,file_name,text[:15000]]) 
-        df_tmp =pd.DataFrame(data = data,
-                            columns=["project_name","path","file_name","text"])
-        return df_tmp
-    
-    except Exception as e:
-        print("get_textにてerror発生")
-        return -1
     
 
 dir_list = glob.glob('./file_dir/**/') #ディレクトリを探す
 for dir in dir_list:
     project_name = dir[11:-1]  #文字列から./file_dirの部分を削除
-    df_tmp = get_text(project_name)
-    output_df = pd.concat([output_df,df_tmp],ignore_index=True)
+    print(project_name)
+    files = glob.glob(os.path.join("./file_dir", project_name,"**","*.*"),recursive=True)
+
+    for filepath in files:
+        print(filepath)
+        text = extract_text_from_file(filepath)
+        file_name  = os.path.basename(filepath)
+        data = [[project_name,filepath,file_name,text[:15000]]]
+        df_tmp = pd.DataFrame(data = data,
+                            columns=["project_name","path","file_name","text"])
+        output_df = pd.concat([output_df,df_tmp],ignore_index=True)
+
 
 single_file_list = glob.glob('./file_dir/*.*') #シングルファイルを探す
 if len(single_file_list)!=0:
-    for single_file in single_file_list:
-        df_tmp = get_text("")
+    for filepath in single_file_list:
+        print(filepath)
+        text = extract_text_from_file(filepath)
+        file_name  = os.path.basename(filepath)
+        data = [["single_file",filepath,file_name,text[:15000]]]
+        df_tmp = pd.DataFrame(data = data,
+                            columns=["project_name","path","file_name","text"])
         output_df = pd.concat([output_df,df_tmp],ignore_index=True)
+
 print(output_df)
+
 
 # データベースに接続
 connection = mysql.connector.connect(user='kouki',  # ユーザー名

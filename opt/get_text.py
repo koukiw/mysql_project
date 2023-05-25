@@ -3,6 +3,31 @@ from pdfminer.high_level import extract_text
 from docx import Document
 from openpyxl import load_workbook
 from pptx import Presentation
+import subprocess
+import os
+
+
+def extract_text_from_file(filepath):
+    try:
+        file_format = os.path.splitext(filepath)[1] [1:]
+        if file_format =="pdf":
+            text = pdf2text(filepath)
+        elif file_format =="csv":
+            text = csv2text(filepath)
+        elif file_format =="xlsx":
+            text = excel2text(filepath)
+        elif file_format =="docx":
+            text = docx2text(filepath)
+        elif file_format =="doc":
+            text = doc2text(filepath)
+        elif file_format =="pptx":
+            text = pptx2text(filepath)
+        return text
+    
+    except Exception as e:
+        print("get_textにてerror発生")
+        return -1
+    
 
 # PDFからテキストを抜き出す
 def pdf2text(file):
@@ -11,7 +36,7 @@ def pdf2text(file):
         text = extract_text(file)
         # テキストの加工
         text = text.replace("\n","").replace("\r","").replace("\t","").strip()
-        print(text[:50])
+        # print(text[:50])
         return text
             
     except Exception as e:
@@ -59,8 +84,8 @@ def excel2text(file):
         return -1
 
 
-#  wordからテキストを抜き出す
-def word2text(file):
+#  .docxからテキストを抜き出す
+def docx2text(file):
     try:
         text = ""
         document = Document(file)
@@ -79,6 +104,20 @@ def word2text(file):
         
     except Exception as e:
         print("word2textにてerror発生")
+        return -1
+
+#  .docからテキストを抜き出す
+def doc2text(file_path):
+    try:
+        command = f"antiword  {file_path}"
+        print(command)
+        output = subprocess.check_output(command, shell=True)
+        text = output.decode('utf-8')
+        text = text.replace("\n","").replace("\r","").replace("\t","").replace(" ","").replace("　","").strip()
+        print(text)
+        return text
+    except subprocess.CalledProcessError:
+        print("doc2textにてerror発生")
         return -1
 
 def pptx2text(file):
