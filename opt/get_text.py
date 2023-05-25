@@ -9,18 +9,18 @@ import os
 
 def extract_text_from_file(filepath):
     try:
-        file_format = os.path.splitext(filepath)[1] [1:]
-        if file_format =="pdf":
+        filepath_format = os.path.splitext(filepath)[1] [1:]
+        if filepath_format =="pdf":
             text = pdf2text(filepath)
-        elif file_format =="csv":
+        elif filepath_format =="csv":
             text = csv2text(filepath)
-        elif file_format =="xlsx":
+        elif filepath_format =="xlsx":
             text = excel2text(filepath)
-        elif file_format =="docx":
+        elif filepath_format =="docx":
             text = docx2text(filepath)
-        elif file_format =="doc":
+        elif filepath_format =="doc":
             text = doc2text(filepath)
-        elif file_format =="pptx":
+        elif filepath_format =="pptx":
             text = pptx2text(filepath)
         return text
     
@@ -30,10 +30,10 @@ def extract_text_from_file(filepath):
     
 
 # PDFからテキストを抜き出す
-def pdf2text(file):
+def pdf2text(filepath):
     try:
         # テキストの抜き出し
-        text = extract_text(file)
+        text = extract_text(filepath)
         # テキストの加工
         text = text.replace("\n","").replace("\r","").replace("\t","").strip()
         # print(text[:50])
@@ -44,9 +44,9 @@ def pdf2text(file):
         return -1
 
 # CSVからテキストを抜き出してjson形式で情報を整理
-def csv2text(file):
+def csv2text(filepath):
     try:
-        pd_dic = pd.read_csv(file, sep=",")
+        pd_dic = pd.read_csv(filepath, sep=",")
         text = {}
         for index, dic in pd_dic.to_dict(orient="index").items():
             text["{}".format(index)] = dic
@@ -60,9 +60,9 @@ def csv2text(file):
         print("csv2textにてerror発生")
         return -1
     
-def excel2text(file):
+def excel2text(filepath):
     try:
-        workbook = load_workbook(file)
+        workbook = load_workbook(filepath)
         sheet_names= workbook.sheetnames
         strings={}
         for index in range(len(sheet_names)):
@@ -85,10 +85,10 @@ def excel2text(file):
 
 
 #  .docxからテキストを抜き出す
-def docx2text(file):
+def docx2text(filepath):
     try:
         text = ""
-        document = Document(file)
+        document = Document(filepath)
         for i, p in enumerate(document.paragraphs):
             text += p.text
 
@@ -107,9 +107,9 @@ def docx2text(file):
         return -1
 
 #  .docからテキストを抜き出す
-def doc2text(file_path):
+def doc2text(filepath_path):
     try:
-        command = f"antiword  {file_path}"
+        command = f"antiword  {filepath_path}"
         print(command)
         output = subprocess.check_output(command, shell=True)
         text = output.decode('utf-8')
@@ -120,10 +120,10 @@ def doc2text(file_path):
         print("doc2textにてerror発生")
         return -1
 
-def pptx2text(file):
+def pptx2text(filepath):
     try:
         strings = []
-        prs = Presentation(file)
+        prs = Presentation(filepath)
         for i, sld in enumerate(prs.slides, start=1):
             for shp in sld.shapes:
                 if shp.has_text_frame:
