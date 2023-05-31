@@ -131,11 +131,11 @@ def docx2text(filepath):
 def doc2text(filepath_path):
     try:
         command = f"antiword  {filepath_path}"
-        print(command)
+        # print(command)
         output = subprocess.check_output(command, shell=True)
         text = output.decode('utf-8')
         text = text.replace("\n","").replace("\r","").replace("\t","").replace(" ","").replace("　","").strip()
-        print(text)
+        # print(text)
         return text
     except subprocess.CalledProcessError:
         print("doc2textにてerror発生")
