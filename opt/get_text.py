@@ -5,17 +5,21 @@ from openpyxl import load_workbook
 from pptx import Presentation
 import subprocess
 import os
+import xlrd
 
 
 def extract_text_from_file(filepath):
     try:
         filepath_format = os.path.splitext(filepath)[1] [1:]
+        text = ""
         if filepath_format =="pdf":
             text = pdf2text(filepath)
         elif filepath_format =="csv":
             text = csv2text(filepath)
         elif filepath_format =="xlsx":
-            text = excel2text(filepath)
+            text = xlsx2text(filepath)
+        elif filepath_format =="xls":
+            text = xls2text(filepath)
         elif filepath_format =="docx":
             text = docx2text(filepath)
         elif filepath_format =="doc":
@@ -43,7 +47,7 @@ def pdf2text(filepath):
         print("pdf2textにてerror発生")
         return -1
 
-# CSVからテキストを抜き出してjson形式で情報を整理
+# CSVからテキストを抜き出してjson形式で情報を整理（indexごとにjson作成）
 def csv2text(filepath):
     try:
         pd_dic = pd.read_csv(filepath, sep=",")
@@ -59,8 +63,9 @@ def csv2text(filepath):
     except Exception as e:
         print("csv2textにてerror発生")
         return -1
-    
-def excel2text(filepath):
+
+#1セルごとに文字列抽出して、単語をリストに格納していく
+def xlsx2text(filepath):
     try:
         workbook = load_workbook(filepath)
         sheet_names= workbook.sheetnames
@@ -82,6 +87,22 @@ def excel2text(filepath):
     except Exception as e:
         print("excel2textにてerror発生")
         return -1
+
+#古い形式のexcelファイル（.xls）からテキスト抽出
+def xls2text(filepath):
+    workbook = xlrd.open_workbook(filepath)
+    sheet = workbook.sheet_by_index(0) #シート情報取得
+    strings= {}
+    for index in range(workbook.nsheets):
+        sheet = workbook.sheet_by_index(index)  
+        string = []
+        for row in range(sheet.nrows):
+            for col in range(sheet.ncols):
+                cell_value = sheet.cell_value(row, col)
+                if cell_value and isinstance(cell_value, str):
+                    string.append(cell_value)
+        strings[sheet.name] = string
+    return str(strings)
 
 
 #  .docxからテキストを抜き出す
