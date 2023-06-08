@@ -4,8 +4,11 @@ RUN mkdir /src
 WORKDIR /src
 
 RUN apt-get update
+RUN apt-get install -y unoconv libreoffice
+RUN apt-get install python3-uno
+RUN apt install -y vim
+# RUN apt-get install libreoffice-pyuno
 RUN apt-get install antiword
-# RUN apt-get install unoconv libreoffice
 # execで入ってから以下のコマンド打てばインストールできる
 # RUN apt-get install iputils-ping net-tools
 # apt-get install lsof 
