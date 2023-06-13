@@ -1,7 +1,7 @@
 # mysql_project
 mysqlにフォルダごとファイル情報を保存していく
 
-ローカルのpython上からmysql-connectorを使ってdocker上のmysqlに接続.  
+docke上で起動させたpythonからmysql-connectorを使ってdocker上別コンテナのmysqlに保存.  
 
 
 進捗
