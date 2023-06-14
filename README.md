@@ -10,7 +10,7 @@ text_tableのtextカラムの最大文字数をvarchra(15000)に設定．
 utf8mb4に設定しているので，最大文字数16383になると思ったが，これだと
 initdb.d/reate_table.sqlから自動生成できない．
 
-手順 
+## 手順 
 
 リポジトリをクローンして、   
 /opt/file_dirに保存したいファイル・ディレクトリをアップロードしたのち   
@@ -23,7 +23,7 @@ docker-compose build --no-cache
 docker-compose up -d
 ```
 でコンテナ起動。
-# unoconv使用方法
+## unoconv使用方法
 コンテナ起動時にシェルスクリプトを動かそうとするとコンテナが起動できないので、手動でシェルスクリプトを実行する必要がある。
 
 ```python
