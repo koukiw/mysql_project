@@ -29,7 +29,7 @@ docker-compose up -d
 ```python
 docker-compose exec python3 bash /src/init.sh
 ```
-で/usr/bin/unooncv内のshebangを書き換えることでunoconvコマンドが使用可能になる。
+で/usr/bin/unoconv内のshebangを書き換えることでunoconvコマンドが使用可能になる。
 
 
 ## データカタログ作成．　　　
