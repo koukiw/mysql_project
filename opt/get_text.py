@@ -4,8 +4,7 @@ from docx import Document
 from openpyxl import load_workbook
 from pptx import Presentation
 import subprocess
-import os
-import xlrd
+import os,re,xlrd
 
 
 def extract_text_from_file(filepath):
@@ -26,6 +25,13 @@ def extract_text_from_file(filepath):
             text = doc2text(filepath)
         elif filepath_format =="pptx":
             text = pptx2text(filepath)
+        elif filepath_format =="ppt":
+            os.system(f"unoconv -f pdf {filepath}")
+            # print(f"{filepath}をpdfに変換しました → {os.path.splitext(filepath)[0]}.pdf")
+            filepath = os.path.splitext(filepath)[0]+".pdf"
+            text = pdf2text(filepath)
+            os.remove(filepath)
+            # print(f"PDFファイル {filepath} を削除しました")
         return text
     
     except Exception as e:
@@ -39,7 +45,11 @@ def pdf2text(filepath):
         # テキストの抜き出し
         text = extract_text(filepath)
         # テキストの加工
-        text = text.replace("\n","").replace("\r","").replace("\t","").strip()
+        # すべての空白文字を削除するパターンを定義
+        pattern = r'\s+'
+        # パターンにマッチする部分を空文字列に置換
+        text = re.sub(pattern, '', text)
+        # text = text.replace("\n","").replace("\r","").replace("\t","").replace(" ","").replace("　","").strip()
         # print(text[:50])
         return text
             
@@ -56,8 +66,10 @@ def csv2text(filepath):
             text["{}".format(index)] = dic
         # テキストの加工
         text = str(text)
-        text = text.replace("\n","").replace("\r","").replace("\t","").strip()
-        # print(text)
+        # すべての空白文字を削除するパターンを定義
+        pattern = r'\s+'
+        # パターンにマッチする部分を空文字列に置換
+        text = re.sub(pattern, '', text)
         return text
 
     except Exception as e:
@@ -118,9 +130,10 @@ def docx2text(filepath):
             for j, r in enumerate(t.rows):
                 for k, c in enumerate(r.cells):
                     text += c.text
-        # テキストの加工
-        text = text.replace("\n","").replace("\r","").replace("\t","").strip()
-        # print(text)
+        # すべての空白文字を削除するパターンを定義
+        pattern = r'\s+'
+        # パターンにマッチする部分を空文字列に置換
+        text = re.sub(pattern, '', text)
         return text
         
     except Exception as e:
@@ -134,8 +147,10 @@ def doc2text(filepath_path):
         # print(command)
         output = subprocess.check_output(command, shell=True)
         text = output.decode('utf-8')
-        text = text.replace("\n","").replace("\r","").replace("\t","").replace(" ","").replace("　","").strip()
-        # print(text)
+        # すべての空白文字を削除するパターンを定義
+        pattern = r'\s+'
+        # パターンにマッチする部分を空文字列に置換
+        text = re.sub(pattern, '', text)
         return text
     except subprocess.CalledProcessError:
         print("doc2textにてerror発生")
