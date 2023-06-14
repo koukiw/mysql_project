@@ -32,6 +32,16 @@ python data.py
 ```
 
 ## テキストデータ抽出．　　
+
+## unoconv使用方法
+コンテナ起動時にシェルスクリプトを動かそうとするとコンテナが起動できないので、手動でシェルスクリプトを実行する必要がある。
+
+```python
+docker-compose exec python3 bash /src/init.sh
+```
+で/usr/bin/unooncv内のshebangを書き換えることでunoconvコマンドが使用可能になる。
+
+上記を行ったのち、
 ```python
 docker-compose exec python3 bash
 cd opt
@@ -56,4 +66,3 @@ use demo_db
 select * from demo_table;
 select * from text_table;
 ```
-
